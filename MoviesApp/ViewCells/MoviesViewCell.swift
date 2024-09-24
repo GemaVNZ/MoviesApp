@@ -33,25 +33,14 @@ class MoviesViewCell: UITableViewCell {
             moviesImage.image = UIImage(named: "image-placeholder")
 
             task?.cancel()
-            
+                    
+
             guard let url = URL(string: movie.poster) else {
                 print("URL de imagen inválida")
                 return
-            }
-
-            task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-                guard let data = data, error == nil else {
-                    print("Error al descargar la imagen: \(error?.localizedDescription ?? "Desconocido")")
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    if let image = UIImage(data: data) {
-                        self?.moviesImage.image = image
                     }
+
+            moviesImage.loadFrom(url: url)
                 }
-            }
-            task?.resume()
-        }
-    }
+}
 

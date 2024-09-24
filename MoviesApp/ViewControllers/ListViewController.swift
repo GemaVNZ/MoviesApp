@@ -59,7 +59,7 @@ class ListViewController: UIViewController, UITableViewDataSource, UISearchBarDe
                 switch result {
                 case .success(let movies):
                     self?.moviesList = movies
-                    self?.moviesInitialList = movies // Guarda la lista inicial
+                    self?.moviesInitialList = movies
                     self?.tableView.reloadData()
                 case .failure(let error):
                     print("Error al buscar películas: \(error.localizedDescription)")
@@ -69,6 +69,7 @@ class ListViewController: UIViewController, UITableViewDataSource, UISearchBarDe
             }
         }
     }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "navigateToDetail" {

@@ -22,36 +22,40 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var plotTextView: UITextView!
     
-    var movie: Movie?
+    var movie: Movie!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let movie = movie {
-            self.navigationItem.title = movie.title
-            titleLabel.text = movie.title
-            yearLabel.text = movie.year
-            runtimeLabel.text = movie.runtime
-            directorLabel.text = movie.director
-            genreLabel.text = movie.genre
-            countryLabel.text = movie.country
-            plotTextView.text = movie.plot
-            
-            if let url = URL(string: movie.poster) {
-                URLSession.shared.dataTask(with: url) { data, response, error in
-                    guard let data = data, error == nil else {
-                        print("Error al descargar la imagen: \(error?.localizedDescription ?? "Desconocido")")
-                        return
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self.moviesImageView.image = UIImage(data: data)
-                    }
-                }.resume()
+        fetchMovieDetails(id: movie.imdbID)
+    }
+    
+    func fetchMovieDetails(id: String) {
+        MoviesProvider.shared.searchMoviesByimdbID(by: id) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let movieDetails):
+                    self?.movie = movieDetails
+                    self?.updateUI()
+                case .failure(let error):
+                    print("Error al obtener detalles de la película: \(error.localizedDescription)")
+                }
             }
-        } else {
-            print("No se recibió ninguna película.")
+        }
+    }
+    
+    func updateUI() {
+        titleLabel.text = movie.title
+        yearLabel.text = movie.year
+        plotTextView.text = movie.plot ?? "Sin descripción disponible."
+        runtimeLabel.text = movie.runtime ?? "Duración no disponible."
+        genreLabel.text = movie.genre ?? "Género no disponible."
+        countryLabel.text = movie.country ?? "País no disponible."
+        
+
+        if let url = URL(string: movie.poster) {
+            moviesImageView.loadFrom(url: url)
         }
     }
 }
